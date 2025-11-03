@@ -27,11 +27,8 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Outputs
+# Outputs (mais garder les visualisations)
 outputs/
-*.png
-*.jpg
-*.pdf
 
 # Données sensibles
 passwords.txt
