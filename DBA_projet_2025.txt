@@ -1,0 +1,63 @@
+TP Bases de Données avancées (BDA) 
+2025 - 2026 
+- Travail à faire en binôme 
+- Validation en continue des parties 
+- Livrables à déposer à chaque fin de séance 
+
+Les fichiers CSV des données sont en annexe. 
+1. Préparation de la base de données : création, remplissage et contraintes d’intégrités  
+1. Créer la base de données 
+2. Vérifier les données et compléter/corriger les données, par exemple le remplissage aléatoire de : 
+a la datef (fin de location) est à mettre à jour par requête sql : datef = datef + valeurs entre 0 et 
+100 (rand()). Attention : il faut mettre à jour la durée (datef – dated en nombre de jours). 
+3. Ajouter les contraintes qui vous semble nécessaires pour préserver l’intégrité de cette base de données 
+(clés, référencement, unicité, valeur ....) 
+4. Vérifier vos contraintes. 
+      
+2. Vues  
+1. Créer une vue V_Client contenant : le code, le prénom et le nom des clients, l’âge, la somme des KM 
+de location (baptisée distance).  
+2. Essayer de mettre à jour le nom d’un client à travers la vue V_Client. Essayer ensuite de mettre à jour 
+le champ « distance » d’un client. Que se passe-t-il à chaque action ?  
+3. Créer une vue V_Client55 qui ne contient que les clients âgés de plus de 55 ans.  
+4. Insérer dans cette vue un nouveau client âgé de 50. Essayer ensuite de retrouver ce client au moyen de 
+la vue V_Client55 puis au moyen de la table Client. 
+
+3. Droits d’accès  
+1. Ajouter  une  nouvelle  table  « ACESS »  pour  le  contrôle  d’accès  (login,  password,  user_id, 
+access_level). Le niveau d’accès peut prendre la valeur suivante : L(lecture), E(écriture), U(update), 
+D(delete) ou T(total), le champs user_id est à incrémenter automatiquement. 
+2. Remplir  la  table  ACCESS  avec  les  clients :  login  =>  nom.prenom  et  password  =>  généré 
+automatiquement (fonction Md5). La valeur par défaut pour l’attribut access_level est « L ». Ajouter 
+les propriétaires avec comme login « email » et comme access_level « E ». 
+3. Créer plusieurs utilisateurs (vous pouvez utiliser la fonctionnalité ADD account sur Workbench) : 
+a Avec des droits de lectures limités sur quelques tables.  
+b Avec des droits de modifications (insert et update) sur quelques tables. 
+c Avec la totalité des droits. Ce dernier aura le droit de partager ses droits.   
+4. Se  connecter  avec  chaque  utilisateur  et  vérifier  les  opérations :  SELECT,  INSERT,  UPDATE  et 
+DELETE.  
+4. Accès concurrents  
+1. Proposer un use case dans lequel vous générez un problème de mise à jour perdue. 
+2. Même question que (1) mais pour une lecture sale. 
+3. Etudier la requête « SELECT FOR UPDATE » et proposer un exemple de son utilisation.  
+  
+5. PL/SQL & Trigger 
+1. Nous  souhaitons  analyser  les  locations  et  attribuer  des  notes  automatiques  selon  la  durée  et  les 
+kilomètres parcourus. Certaines notes doivent rester nulles si les données sont incomplètes. Proposer 
+une procédure (ex. si KM>1000 et durée > 50jours => note 5, ... si durée =1 jour, laisser la note à 
+NULL). 
+2. Compléter  la  procédure  ou  créer  une  autre  procédure  pour  mettre  à  jour  le  champs  « avis ».  Par 
+exemple : si la note est >=4, l’avis sera « très satisfait », ... si la note est « null », l’avis sera « non 
+évalué ».  
+3. Ajouter une procédure qui permet d’analyser les locations pour un client donné en paramètre. Par 
+exemple : il faut calculer la durée totale de location, nombre de véhicules différents loués, la moyenne 
+des notes. 
+4. Une voiture peut avoir plusieurs états (disponible, en réparation, en location, ...). Proposer une solution 
+pour vérifier l’état d’une voiture avant la location et après le retour de location (ajouter la colonne 
+« etat » dans la table voiture). 
+5. Proposer une solution automatique pour gérer l’historique de changement d’état d’une voiture.  
+ 
+6. Application & data visualisation 
+1. Proposer une application (ex. Python) permettant de se connecter à la base de données et d’exécuter 
+des opérations CRUD (5 opérations par type). 
+2. Proposer 5 visuels différents.  
