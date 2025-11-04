@@ -24,6 +24,26 @@ def print_header(title):
     print(f"  {title}")
     print("="*80)
 
+def input_non_vide(prompt: str, message_erreur: str = "⚠️  Ce champ ne peut pas être vide") -> str:
+    """Demander une entrée non vide à l'utilisateur"""
+    while True:
+        valeur = input(prompt).strip()
+        if valeur:
+            return valeur
+        print(message_erreur)
+
+def input_numerique(prompt: str, message_erreur: str = "⚠️  Veuillez entrer un nombre valide") -> int:
+    """Demander un nombre entier à l'utilisateur"""
+    while True:
+        valeur = input(prompt).strip()
+        if not valeur:
+            print("⚠️  Ce champ ne peut pas être vide")
+            continue
+        try:
+            return int(valeur)
+        except ValueError:
+            print(message_erreur)
+
 class MenuInteractif:
     """Menu interactif pour la gestion de la BDD"""
     
@@ -88,7 +108,7 @@ class MenuInteractif:
         """Rechercher un client"""
         clear_screen()
         print_header("RECHERCHER UN CLIENT")
-        codec = input("Code client (ex: C654): ").strip()
+        codec = input_non_vide("Code client (ex: C654): ")
         
         clients = self.crud_client.read(codec)
         if clients:
@@ -120,13 +140,13 @@ class MenuInteractif:
         print_header("CRÉER UN NOUVEAU CLIENT")
         
         try:
-            codec = input("Code client (ex: C999): ").strip()
-            nom = input("Nom: ").strip()
-            prenom = input("Prénom: ").strip()
-            age = int(input("Âge: ").strip())
-            permis = input("Numéro de permis: ").strip()
-            adresse = input("Adresse: ").strip()
-            ville = input("Ville: ").strip()
+            codec = input_non_vide("Code client (ex: C999): ")
+            nom = input_non_vide("Nom: ")
+            prenom = input_non_vide("Prénom: ")
+            age = input_numerique("Âge: ")
+            permis = input_non_vide("Permis (B, A, C...): ")
+            adresse = input_non_vide("Adresse: ")
+            ville = input_non_vide("Ville: ")
             
             print("\n📝 Résumé:")
             print(f"   Code: {codec}")
@@ -145,11 +165,11 @@ class MenuInteractif:
         pause()
     
     def modifier_client(self):
-        """Modifier un client"""
+        """Modifier un client existant"""
         clear_screen()
         print_header("MODIFIER UN CLIENT")
         
-        codec = input("Code du client à modifier: ").strip()
+        codec = input_non_vide("Code du client à modifier: ")
         clients = self.crud_client.read(codec)
         
         if not clients:
@@ -199,7 +219,7 @@ class MenuInteractif:
         clear_screen()
         print_header("SUPPRIMER UN CLIENT")
         
-        codec = input("Code du client à supprimer: ").strip()
+        codec = input_non_vide("Code du client à supprimer: ")
         clients = self.crud_client.read(codec)
         
         if not clients:
@@ -269,7 +289,7 @@ class MenuInteractif:
         """Rechercher une voiture"""
         clear_screen()
         print_header("RECHERCHER UNE VOITURE")
-        immat = input("Immatriculation (ex: 11FG62): ").strip()
+        immat = input_non_vide("Immatriculation (ex: 11FG62): ")
         
         voitures = self.crud_voiture.read(immat)
         if voitures:
@@ -299,16 +319,30 @@ class MenuInteractif:
         print_header("CRÉER UNE NOUVELLE VOITURE")
         
         try:
-            immat = input("Immatriculation: ").strip()
-            marque = input("Marque: ").strip()
-            modele = input("Modèle: ").strip()
-            categorie = input("Catégorie (luxe, premium, familiale, etc.): ").strip()
-            couleur = input("Couleur: ").strip()
-            places = int(input("Nombre de places: ").strip())
-            achat_annee = int(input("Année d'achat: ").strip())
-            compteur = int(input("Kilométrage: ").strip())
-            prix_jour = float(input("Prix par jour (€): ").strip())
-            code_proprio = input("Code propriétaire: ").strip()
+            immat = input_non_vide("Immatriculation: ")
+            marque = input_non_vide("Marque: ")
+            modele = input_non_vide("Modèle: ")
+            categorie = input_non_vide("Catégorie (luxe, premium, familiale, etc.): ")
+            couleur = input_non_vide("Couleur: ")
+            places = input_numerique("Nombre de places: ")
+            achat_annee = input_numerique("Année d'achat: ")
+            compteur = input_numerique("Kilométrage: ")
+            
+            while True:
+                prix_input = input("Prix par jour (€): ").strip()
+                if not prix_input:
+                    print("⚠️  Ce champ ne peut pas être vide")
+                    continue
+                try:
+                    prix_jour = float(prix_input)
+                    if prix_jour <= 0:
+                        print("⚠️  Le prix doit être positif")
+                        continue
+                    break
+                except ValueError:
+                    print("⚠️  Veuillez entrer un nombre valide")
+            
+            code_proprio = input_non_vide("Code propriétaire: ")
             
             confirmer = input("\nConfirmer la création ? (o/n): ").strip().lower()
             if confirmer == 'o':
@@ -324,7 +358,7 @@ class MenuInteractif:
         clear_screen()
         print_header("MODIFIER UNE VOITURE")
         
-        immat = input("Immatriculation de la voiture à modifier: ").strip()
+        immat = input_non_vide("Immatriculation de la voiture à modifier: ")
         voitures = self.crud_voiture.read(immat)
         
         if not voitures:
@@ -363,7 +397,7 @@ class MenuInteractif:
         clear_screen()
         print_header("SUPPRIMER UNE VOITURE")
         
-        immat = input("Immatriculation de la voiture à supprimer: ").strip()
+        immat = input_non_vide("Immatriculation de la voiture à supprimer: ")
         voitures = self.crud_voiture.read(immat)
         
         if not voitures:
@@ -462,7 +496,7 @@ class MenuInteractif:
         clear_screen()
         print_header("LOCATIONS D'UN CLIENT")
         
-        codec = input("Code client: ").strip()
+        codec = input_non_vide("Code client: ")
         locations = self.crud_location.read(codec=codec)
         
         if locations:
@@ -479,7 +513,7 @@ class MenuInteractif:
         clear_screen()
         print_header("LOCATIONS D'UNE VOITURE")
         
-        immat = input("Immatriculation: ").strip()
+        immat = input_non_vide("Immatriculation: ")
         locations = self.crud_location.read(immat=immat)
         
         if locations:
@@ -497,18 +531,26 @@ class MenuInteractif:
         print_header("CRÉER UNE NOUVELLE LOCATION")
         
         try:
-            codec = input("Code client: ").strip()
-            immat = input("Immatriculation voiture: ").strip()
-            annee = int(input("Année: ").strip())
-            mois = int(input("Mois (1-12): ").strip())
-            numloc = input("Numéro location: ").strip()
-            km = int(input("Kilométrage: ").strip())
-            duree = int(input("Durée (jours): ").strip())
-            villed = input("Ville de départ: ").strip()
-            villea = input("Ville d'arrivée: ").strip()
+            codec = input_non_vide("Code client: ")
+            immat = input_non_vide("Immatriculation voiture: ")
+            annee = input_numerique("Année: ")
+            mois = input_numerique("Mois (1-12): ")
+            numloc = input_non_vide("Numéro location: ")
+            km = input_numerique("Kilométrage: ")
+            duree = input_numerique("Durée (jours): ")
+            villed = input_non_vide("Ville de départ: ")
+            villea = input_non_vide("Ville d'arrivée: ")
             
-            date_str = input("Date début (YYYY-MM-DD): ").strip()
-            dated = datetime.strptime(date_str, "%Y-%m-%d").date()
+            while True:
+                date_str = input("Date début (YYYY-MM-DD): ").strip()
+                if not date_str:
+                    print("⚠️  Ce champ ne peut pas être vide")
+                    continue
+                try:
+                    dated = datetime.strptime(date_str, "%Y-%m-%d").date()
+                    break
+                except ValueError:
+                    print("⚠️  Format de date invalide. Utilisez YYYY-MM-DD")
             
             confirmer = input("\nConfirmer la création ? (o/n): ").strip().lower()
             if confirmer == 'o':
@@ -525,11 +567,11 @@ class MenuInteractif:
         print_header("MODIFIER UNE LOCATION")
         
         print("Pour modifier une location, vous devez fournir sa clé complète:")
-        codec = input("Code client: ").strip()
-        immat = input("Immatriculation: ").strip()
-        annee = int(input("Année: ").strip())
-        mois = int(input("Mois: ").strip())
-        numloc = input("Numéro location: ").strip()
+        codec = input_non_vide("Code client: ")
+        immat = input_non_vide("Immatriculation: ")
+        annee = input_numerique("Année: ")
+        mois = input_numerique("Mois: ")
+        numloc = input_non_vide("Numéro location: ")
         
         print("\n✏️  Modifications (Entrée pour conserver):")
         
