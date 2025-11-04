@@ -15,6 +15,7 @@ PROMPT ============================================================
 
 CREATE OR REPLACE PROCEDURE noter_location(p_codeC NUMBER DEFAULT NULL) AS
     v_count NUMBER := 0;
+    v_note NUMBER;
 BEGIN
     DBMS_OUTPUT.PUT_LINE('Début de la notation des locations...');
     
@@ -26,53 +27,57 @@ BEGIN
         WHERE p_codeC IS NULL OR codeC = p_codeC
         ORDER BY codeC, annee, mois
     ) LOOP
-        -- Règles de notation:
+        -- Règles de notation améliorées (plus variées):
         -- - NULL si km NULL ou duree NULL ou duree = 1
-        -- - 5 si km > 1000 ET duree > 50
-        -- - 4 si duree >= 14
-        -- - 3 sinon
+        -- - Note basée sur une combinaison km/durée avec plus de nuances
         
         IF r.km IS NULL OR r.duree IS NULL OR r.duree = 1 THEN
-            -- Laisser la note à NULL
-            UPDATE Location 
-            SET note = NULL
-            WHERE codeC = r.codeC 
-              AND immat = r.immat
-              AND annee = r.annee 
-              AND mois = r.mois 
-              AND numLoc = r.numLoc;
+            -- Laisser la note à NULL pour données incomplètes
+            v_note := NULL;
               
-        ELSIF r.km > 1000 AND r.duree > 50 THEN
-            -- Excellente location
-            UPDATE Location 
-            SET note = 5
-            WHERE codeC = r.codeC 
-              AND immat = r.immat
-              AND annee = r.annee 
-              AND mois = r.mois 
-              AND numLoc = r.numLoc;
-            v_count := v_count + 1;
+        ELSIF r.km >= 2000 AND r.duree >= 60 THEN
+            -- Excellente location longue distance
+            v_note := 5;
             
-        ELSIF r.duree >= 14 THEN
-            -- Bonne location
-            UPDATE Location 
-            SET note = 4
-            WHERE codeC = r.codeC 
-              AND immat = r.immat
-              AND annee = r.annee 
-              AND mois = r.mois 
-              AND numLoc = r.numLoc;
-            v_count := v_count + 1;
+        ELSIF r.km >= 1500 OR r.duree >= 45 THEN
+            -- Très bonne location
+            v_note := 5;
+            
+        ELSIF r.km >= 800 AND r.duree >= 20 THEN
+            -- Bonne location moyenne distance
+            v_note := 4;
+            
+        ELSIF r.duree >= 30 OR r.km >= 1000 THEN
+            -- Bonne location (soit longue, soit beaucoup de km)
+            v_note := 4;
+            
+        ELSIF r.km >= 400 AND r.duree >= 10 THEN
+            -- Location correcte
+            v_note := 3;
+            
+        ELSIF r.duree >= 15 OR r.km >= 500 THEN
+            -- Location moyenne-correcte
+            v_note := 3;
+            
+        ELSIF r.km >= 200 OR r.duree >= 5 THEN
+            -- Location courte acceptable
+            v_note := 2;
             
         ELSE
-            -- Location standard
-            UPDATE Location 
-            SET note = 3
-            WHERE codeC = r.codeC 
-              AND immat = r.immat
-              AND annee = r.annee 
-              AND mois = r.mois 
-              AND numLoc = r.numLoc;
+            -- Location très courte ou peu de km
+            v_note := 1;
+        END IF;
+        
+        -- Mise à jour de la note
+        UPDATE Location 
+        SET note = v_note
+        WHERE codeC = r.codeC 
+          AND immat = r.immat
+          AND annee = r.annee 
+          AND mois = r.mois 
+          AND numLoc = r.numLoc;
+          
+        IF v_note IS NOT NULL THEN
             v_count := v_count + 1;
         END IF;
     END LOOP;
