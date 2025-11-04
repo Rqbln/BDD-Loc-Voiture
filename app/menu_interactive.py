@@ -158,8 +158,10 @@ class MenuInteractif:
             return
         
         # Afficher les infos actuelles
-        _, nom, prenom, age, permis, adresse, ville = clients[0]
+        # SELECT * FROM Client retourne: CodeC, Nom, Prenom, Age, Permis, Adresse, Ville
+        codec_db, nom, prenom, age, permis, adresse, ville = clients[0]
         print(f"\n📋 Informations actuelles:")
+        print(f"   Code: {codec_db}")
         print(f"   Nom: {nom}")
         print(f"   Prénom: {prenom}")
         print(f"   Âge: {age}")
@@ -205,13 +207,16 @@ class MenuInteractif:
             pause()
             return
         
-        _, nom, prenom, age, permis, adresse, ville = clients[0]
+        # SELECT * FROM Client retourne: CodeC, Nom, Prenom, Age, Permis, Adresse, Ville
+        client_data = clients[0]
+        codec_db, nom, prenom, age, permis, adresse, ville = client_data
+        
         print(f"\n⚠️  Voulez-vous vraiment supprimer:")
-        print(f"   {nom} {prenom} (Code: {codec})")
+        print(f"   {nom} {prenom} (Code: {codec_db})")
         
         confirmer = input("\nConfirmer la suppression ? (o/n): ").strip().lower()
         if confirmer == 'o':
-            self.crud_client.delete(codec)
+            self.crud_client.delete(codec_db)
         else:
             print("Suppression annulée")
         
