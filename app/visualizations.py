@@ -187,11 +187,86 @@ class DataVisualizer:
         print(f"✅ Sauvegardé: {filepath}")
         plt.close()
     
-    # ========== VISUALISATION 4: Analyse multi-critères ==========
+    # ========== VISUALISATION 4: Distribution des notes de satisfaction ==========
     
-    def viz4_analyse_multicriteres(self):
-        """Graphique 4: Analyse avancée - Popularité par catégorie"""
-        print("\n📊 Visualisation 4: Analyse multi-critères...")
+    def viz4_satisfaction_notes(self):
+        """Graphique 4: Analyse des notes de satisfaction"""
+        print("\n📊 Visualisation 4: Notes de satisfaction...")
+        
+        query = """
+            SELECT note, COUNT(*) as nb_locations
+            FROM Location
+            WHERE note IS NOT NULL
+            GROUP BY note
+            ORDER BY note
+        """
+        
+        df = self.get_dataframe(query)
+        if df.empty:
+            print("❌ Pas de données")
+            return
+        
+        df.columns = ['Note', 'Nb_Locations']
+        
+        # Créer une figure avec 2 sous-graphiques
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+        
+        # Graphique 1: Histogramme des notes
+        colors = sns.color_palette('RdYlGn', len(df))
+        bars = ax1.bar(df['Note'], df['Nb_Locations'], color=colors, edgecolor='black', linewidth=2, width=0.6)
+        
+        # Ajouter les valeurs sur les barres
+        for bar in bars:
+            height = bar.get_height()
+            ax1.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{int(height)}',
+                    ha='center', va='bottom', fontsize=12, weight='bold')
+        
+        ax1.set_xlabel('Note de Satisfaction (sur 5)', fontsize=14, weight='bold')
+        ax1.set_ylabel('Nombre de Locations', fontsize=14, weight='bold')
+        ax1.set_title('Distribution des Notes de Satisfaction', fontsize=16, weight='bold', pad=20)
+        ax1.set_xticks([1, 2, 3, 4, 5])
+        ax1.set_xlim(0.5, 5.5)
+        ax1.grid(axis='y', alpha=0.3)
+        
+        # Ajouter statistiques
+        total = df['Nb_Locations'].sum()
+        moyenne = (df['Note'] * df['Nb_Locations']).sum() / total
+        ax1.text(0.98, 0.98, f'Note moyenne: {moyenne:.2f}/5\nTotal: {total} locations',
+                transform=ax1.transAxes, fontsize=12,
+                verticalalignment='top', horizontalalignment='right',
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+        
+        # Graphique 2: Camembert (Pie chart)
+        colors_pie = ['#ff6b6b', '#ffd93d', '#6bcf7f'][:len(df)]
+        explode = [0.05] * len(df)
+        
+        wedges, texts, autotexts = ax2.pie(df['Nb_Locations'], 
+                                            labels=[f'Note {int(n)}' for n in df['Note']], 
+                                            autopct='%1.1f%%',
+                                            colors=colors_pie,
+                                            explode=explode,
+                                            startangle=90,
+                                            textprops={'fontsize': 11, 'weight': 'bold'})
+        
+        ax2.set_title('Répartition des Satisfactions', fontsize=16, weight='bold', pad=20)
+        
+        # Améliorer la lisibilité du pie chart
+        for autotext in autotexts:
+            autotext.set_color('white')
+            autotext.set_fontsize(12)
+        
+        plt.tight_layout()
+        filepath = f"{OUTPUT_DIR}/04_satisfaction_notes.png"
+        plt.savefig(filepath, dpi=300, bbox_inches='tight')
+        print(f"✅ Sauvegardé: {filepath}")
+        plt.close()
+    
+    # ========== VISUALISATION 5: Analyse multi-critères ==========
+    
+    def viz5_analyse_multicriteres(self):
+        """Graphique 5: Analyse avancée - Popularité par catégorie"""
+        print("\n📊 Visualisation 5: Analyse multi-critères...")
         
         query = """
             SELECT v.Categorie,
@@ -247,7 +322,7 @@ class DataVisualizer:
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
         
         plt.tight_layout()
-        filepath = f"{OUTPUT_DIR}/04_analyse_multicriteres.png"
+        filepath = f"{OUTPUT_DIR}/05_analyse_multicriteres.png"
         plt.savefig(filepath, dpi=300, bbox_inches='tight')
         print(f"✅ Sauvegardé: {filepath}")
         plt.close()
@@ -377,14 +452,15 @@ class DataVisualizer:
             self.viz1_categories_voitures()
             self.viz2_top_clients_km()
             self.viz3_evolution_locations()
-            self.viz4_analyse_multicriteres()
+            self.viz4_satisfaction_notes()
+            self.viz5_analyse_multicriteres()
             self.viz_bonus_dashboard()
             
             print("\n" + "="*80)
             print(f"✅ TOUTES LES VISUALISATIONS GÉNÉRÉES DANS '{OUTPUT_DIR}/'")
             print("="*80)
             print("\nFichiers créés:")
-            for i in range(1, 5):
+            for i in range(1, 6):
                 print(f"  • 0{i}_*.png")
             print(f"  • BONUS_dashboard.png")
             
