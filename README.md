@@ -184,25 +184,8 @@ python app/visualizations.py
 4. Analyse catégories vs popularité (multi-critères)
 5. Dashboard récapitulatif complet (BONUS)
 
-### 4️⃣ Exécuter les Tests
 
-Suite de 16 tests automatisés :
-
-```bash
-source venv/bin/activate
-python app/tests.py
-```
-
-**Tests couverts :**
-- Contraintes d'intégrité (âge, note, prix)
-- Procédures PL/SQL (noter_location, maj_avis, calculer_ca)
-- Triggers (audit, validation)
-- Vues (V_Client, V_Client55)
-- Scénarios métier (location, recherche)
-- Intégrité référentielle
-- Performance
-
-### 5️⃣ SQL*Plus (Mode Avancé)
+### SQL*Plus (Mode Avancé)
 
 Connexion directe à Oracle :
 
